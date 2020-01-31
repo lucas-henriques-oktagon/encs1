@@ -1,2 +1,2 @@
-# encs2
-encs2 team for GGJ2020
+# encs1
+encs1 team for GGJ2020
