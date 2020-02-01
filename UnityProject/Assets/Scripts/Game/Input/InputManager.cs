@@ -8,19 +8,46 @@ using static Unity.Mathematics.math;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class InputManager : ComponentSystem
+public class S_MovementInput : ComponentSystem
 {
     private EntityQuery m_EntityQuery;
-    private string[] m_InputMap = new string[]
-    {
-        "Horizontal_0",
-        "Action_0",
-        "Jump_0",
-    };
-        
+
     protected override void OnCreate()
     {
-        m_EntityQuery = GetEntityQuery(ComponentType.ReadOnly<C_PlayerInput>());
+        m_EntityQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { ComponentType.ReadOnly<C_PlayerInput>(), typeof(MovementComponentData) },
+        });
+    }
+       
+    protected override void OnUpdate()
+    {
+        var entities = m_EntityQuery.ToEntityArray(Allocator.TempJob);
+        var playerInput = m_EntityQuery.ToComponentDataArray<C_PlayerInput>(Allocator.TempJob);
+        var movement = m_EntityQuery.ToComponentDataArray<MovementComponentData>(Allocator.TempJob);
+
+        for (int i = 0; i < playerInput.Length; i++)
+        {
+            float horizontal = Input.GetAxis($"Horizontal_{playerInput[i].horizontal}");
+            EntityManager.SetComponentData(entities[i], new MovementComponentData { speed = horizontal });
+        }
+
+        entities.Dispose();
+        playerInput.Dispose();
+        movement.Dispose();
+    }
+}
+
+public class S_PickupInput : ComponentSystem
+{
+    private EntityQuery m_EntityQuery;
+
+    protected override void OnCreate()
+    {
+        m_EntityQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { ComponentType.ReadOnly<C_PlayerInput>(), ComponentType.ReadOnly<C_CanPick>() },
+        });
     }
 
     protected override void OnUpdate()
@@ -30,28 +57,13 @@ public class InputManager : ComponentSystem
 
         for (int i = 0; i < playerInput.Length; i++)
         {
-            //horizontal movement
-            float x = Input.GetAxis(m_InputMap[playerInput[i].horizontal]);
-            //add movement component
-
-            if (x != 0)
-                Debug.Log(x);
-            
-            //jump
-            if (Input.GetButtonDown(m_InputMap[playerInput[i].jump]))
+            if(Input.GetButton($"Action_{playerInput[i].action}"))
             {
-                //add jump component
-            }
-
-            //action
-            if (Input.GetButtonDown(m_InputMap[playerInput[i].action]))
-            {
-                //add pickup/drop component
+                EntityManager.AddComponent<TC_PickHoldAction>(entities[i]);
             }
         }
 
-        playerInput.Dispose();
         entities.Dispose();
-
+        playerInput.Dispose();
     }
 }
