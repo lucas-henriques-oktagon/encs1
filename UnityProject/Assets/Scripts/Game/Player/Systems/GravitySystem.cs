@@ -5,14 +5,15 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Physics;
 
-public class JumpingSystem : JobComponentSystem
+[AlwaysSynchronizeSystem]
+public class GravitySystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         float deltaTime = Time.DeltaTime;
-        float gravity = 2; //use utils
+        float gravity = 1; //use utils
 
-        Entities.ForEach((ref PhysicsVelocity vel, in JumpComponentData jump) =>
+        Entities.WithAll<JumpComponentData>().ForEach((ref PhysicsVelocity vel) =>
         {
             if (vel.Linear.y > 0)
             {
