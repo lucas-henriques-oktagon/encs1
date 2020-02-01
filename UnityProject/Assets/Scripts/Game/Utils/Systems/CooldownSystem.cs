@@ -33,7 +33,7 @@ public class CooldownSystem : JobComponentSystem
         {
             ActualDeltaTime = Time.DeltaTime,
             ChunkCooldownComponent = GetArchetypeChunkComponentType<C_CooldownComponent>(),
-            CommandBuffer = m_EndSimulationEntityCommandBufferSystem.CreateCommandBuffer(),
+            CommandBuffer = m_EndSimulationEntityCommandBufferSystem.CreateCommandBuffer().ToConcurrent(),
             Entities = lEntities
         }.Schedule(m_Query, inputDeps);
 
@@ -49,7 +49,7 @@ public class CooldownSystem : JobComponentSystem
     {
         public ArchetypeChunkComponentType<C_CooldownComponent> ChunkCooldownComponent;
         public NativeArray<Entity> Entities;
-        public EntityCommandBuffer CommandBuffer;
+        public EntityCommandBuffer.Concurrent CommandBuffer;
         public float ActualDeltaTime;
         
         
@@ -62,7 +62,7 @@ public class CooldownSystem : JobComponentSystem
 
                 if (cooldownComponents[i].DeltaTime >= cooldownComponents[i].Cooldown)
                 {
-                    CommandBuffer.AddComponent<TC_CooldownCompleted>(Entities[chunkIndex + i]);
+                    CommandBuffer.AddComponent<TC_CooldownCompleted>(chunkIndex, Entities[chunkIndex + i]);
                 }
                 else
                 {
