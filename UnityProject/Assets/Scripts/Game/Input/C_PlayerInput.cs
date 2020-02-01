@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
-[Serializable]
+[Serializable][GenerateAuthoringComponent]
 public struct C_PlayerInput : IComponentData
 {
     public int horizontal;

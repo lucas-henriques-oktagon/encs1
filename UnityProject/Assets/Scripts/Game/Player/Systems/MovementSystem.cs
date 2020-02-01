@@ -11,21 +11,31 @@ using Unity.Physics;
 [AlwaysSynchronizeSystem]
 public class MovementSystem : JobComponentSystem
 {
+
+    public BeginSimulationEntityCommandBufferSystem begin;
+
+    protected override void OnCreate()
+    {
+        begin = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
+    }
+
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
+        EntityCommandBuffer entityCommandBuffer = begin.CreateCommandBuffer();
+
         float deltaTime = Time.DeltaTime;
 
-        Entities.ForEach((ref Translation trans, ref MovementComponentData moveData) =>
+        JobHandle jobHandle = Entities
+            .ForEach((Entity entity, int entityInQueryIndex, ref Translation trans, ref MovementComponentData moveData, ref DirectionData directionData, in TC_MovingComponentData movingData) =>
         {
-            trans.Value.x += deltaTime * moveData.speed;
+            trans.Value = new float3(trans.Value.x + (deltaTime * moveData.speed * movingData.Value), trans.Value.y, trans.Value.z);
+            Debug.Log(trans.Value);
+            directionData.directionLook = new int2((int)math.round(moveData.speed), directionData.directionLook.y);
 
-            //if (moveData.directionLook.x != -1)
-            //{
-            //    moveData.directionLook = new int2 (-1, moveData.directionLook.y);
-            //}
+        }).WithBurst().Schedule(inputDeps);
 
-        }).Run();
+        jobHandle.Complete();
 
-        return inputDeps;
+        return jobHandle;
     }
 }
