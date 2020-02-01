@@ -29,9 +29,9 @@ public class PickupSystem : JobComponentSystem
         JobHandle handle = Entities.
             WithAll<TC_PickHoldAction>()
             .WithNone<C_HoldComponentData>()
-            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in MovementComponentData movementData) =>
+            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in DirectionData directionData) =>
             {
-                int2 i2Direction = movementData.directionLook;
+                int2 i2Direction = directionData.directionLook;
                 float fMinLength = translation.Value.x;
                 float fMaxLength = translation.Value.x + i2Direction.x * canPick.PickupDistance;
             

@@ -27,9 +27,9 @@ public class DropSystem : JobComponentSystem
         JobHandle jobHandle = Entities
             .WithAll<TC_PickHoldAction>()
             .WithNone<C_CanPick>()
-            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_HoldComponentData holdComponent, in MovementComponentData movementData) =>
+            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_HoldComponentData holdComponent, in DirectionData directionData) =>
             {
-                int2 i2Direction = movementData.directionLook;
+                int2 i2Direction = directionData.directionLook;
                 float fXDropPosition = translation.Value.x + (float)i2Direction.x/2;
                 
                 commandBuffer.AddComponent<MC_RemoveInHold>(entityInQueryIndex, holdComponent.Item);
