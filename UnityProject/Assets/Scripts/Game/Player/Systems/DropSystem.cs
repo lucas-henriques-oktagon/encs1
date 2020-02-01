@@ -20,7 +20,7 @@ public class DropSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         JobHandle jobHandle = Entities
-            .WithAll<C_HoldComponentData>()
+            .WithAll<TC_PickHoldAction>()
             .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_HoldComponentData canPick, in MovementComponentData movementData) =>
             {
                 
