@@ -11,6 +11,8 @@ public struct TC_Pickable : IComponentData {}
 
 public struct TC_PickAction : IComponentData {}
 
+public struct TC_InHold : IComponentData {}
+
 // This will hold the picked Entity
 public struct C_HoldComponentData : IComponentData
 {

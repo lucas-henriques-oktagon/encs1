@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
 using Unity.Mathematics;
+using UnityEngine;
 
 public class PickupSystem : JobComponentSystem
 {
@@ -21,37 +22,55 @@ public class PickupSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         NativeArray<Entity> lEntitiesToPickup = m_Query.ToEntityArray(Allocator.TempJob);
-
-        ComponentDataFromEntity<Translation> xesque = GetComponentDataFromEntity<Translation>(true);
+        NativeArray<Translation> entitiesTranslation = m_Query.ToComponentDataArray<Translation>(Allocator.TempJob);
+        EntityCommandBuffer.Concurrent commandBuffer = m_EntityCommandBuffer.CreateCommandBuffer().ToConcurrent();
+        
         
         JobHandle handle = Entities.
-            WithAll<C_CanPick, TC_PickAction>().
-            ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in Rotation rotation, in C_CanPick canPick) =>
-        {
-            int2 Direction = new int2 {x = 1, y = 0};
-            float MinLength = translation.Value.x;
-            float MaxLength = translation.Value.x + Direction.x;
-            
-            
-            int iClosestEntity = -1;
-            float lastDistance = -1;
-            for (int i = 0; i < lEntitiesToPickup.Length; i++)
+            WithAll<TC_PickAction>().
+            ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in MovementComponentData movementData) =>
             {
-                Translation objTranslation = xesque[lEntitiesToPickup[i]];
-                if (!Utils.IsInRange(objTranslation.Value.x, MinLength, MaxLength)) continue;
-                var actualDistance = Utils.CalculateDistance(objTranslation.Value.x, translation.Value.x);
-                lastDistance = (lastDistance < actualDistance ? actualDistance : lastDistance);
-                iClosestEntity = (lastDistance < actualDistance ? i : iClosestEntity);
-
-            }
+                int2 i2Direction = movementData.directionLook;
+                float fMinLength = translation.Value.x;
+                float fMaxLength = translation.Value.x + i2Direction.x;
             
-        }).Schedule(inputDeps);
+                Debug.Log(fMinLength + " - " + fMaxLength);
+            
+                int iClosestEntity = -1;
+                float lastDistance = -1;
+                for (int i = 0; i < entitiesTranslation.Length; i++)
+                {
+                    Translation objTranslation = new Translation {Value = entitiesTranslation[i].Value};
+                    if (!Utils.IsInRange(objTranslation.Value.x, fMinLength, fMaxLength)) continue;
+                    var actualDistance = Utils.CalculateDistance(objTranslation.Value.x, translation.Value.x);
+                    if(lastDistance > actualDistance) continue;
+                    lastDistance = actualDistance;
+                    iClosestEntity = i;
+                }
+                
+                if(iClosestEntity == -1) {}
+                else
+                {
+                    commandBuffer.RemoveComponent<C_CanPick>(entityInQueryIndex, entity);
+                    commandBuffer.AddComponent<C_HoldComponentData>(entityInQueryIndex, entity);
+                    commandBuffer.SetComponent(entityInQueryIndex, entity, new C_HoldComponentData
+                    {
+                        Item = lEntitiesToPickup[iClosestEntity]
+                    });
+
+                    commandBuffer.RemoveComponent<TC_Pickable>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
+                    commandBuffer.AddComponent<TC_InHold>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
+                }
+                commandBuffer.RemoveComponent<TC_PickAction>(entityInQueryIndex, entity);
+                
+        }).WithoutBurst().Schedule(inputDeps);
 
         handle.Complete();
         
         m_EntityCommandBuffer.AddJobHandleForProducer(handle);
         
         lEntitiesToPickup.Dispose(inputDeps);
+        entitiesTranslation.Dispose(inputDeps);
         return handle;
     }
 }
