@@ -11,17 +11,22 @@ public class PickupPlayerConverter : MonoBehaviour, IConvertGameObjectToEntity
    {
        dstManager.AddComponent<C_CanPick>(entity);
        dstManager.AddComponent<Translation>(entity);
-       dstManager.AddComponent<MovementComponentData>(entity);
+       dstManager.AddComponent<DirectionData>(entity);
        
        dstManager.SetComponentData(entity, new Translation
        {
            Value = transform.position,
        });
        
-       dstManager.SetComponentData(entity, new MovementComponentData
+       dstManager.SetComponentData(entity, new DirectionData
        {
-           speed = 0,
+           //speed = 0,
            directionLook = new int2 { x = 1, y = 0 }
        });
-   }
+
+        dstManager.SetComponentData(entity, new MovementComponentData
+        {
+            speed = 0,
+        });
+    }
 }

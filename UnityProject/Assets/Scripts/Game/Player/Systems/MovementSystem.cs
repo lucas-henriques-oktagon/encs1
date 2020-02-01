@@ -17,26 +17,12 @@ public class MovementSystem : JobComponentSystem
 
         Entities.ForEach((ref Translation trans, ref MovementComponentData moveData) =>
         {
+            trans.Value.x += deltaTime * moveData.speed;
 
-            if (Input.GetKey(KeyCode.LeftArrow)) //input left
-            {
-                trans.Value.x += deltaTime * -moveData.speed;
-
-                if (moveData.directionLook.x != -1)
-                {
-                    moveData.directionLook = new int2 (-1, moveData.directionLook.y);
-                }
-            }
-            else if (Input.GetKey(KeyCode.RightArrow)) // input right
-            {
-                trans.Value.x += deltaTime * moveData.speed;
-
-                if (moveData.directionLook.x != 1)
-                {
-                    moveData.directionLook = new int2(1, moveData.directionLook.y);
-                }
-            }
-
+            //if (moveData.directionLook.x != -1)
+            //{
+            //    moveData.directionLook = new int2 (-1, moveData.directionLook.y);
+            //}
 
         }).Run();
 

@@ -28,7 +28,7 @@ public class PickupSystem : JobComponentSystem
         
         JobHandle handle = Entities.
             WithAll<TC_PickHoldAction>().
-            ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in MovementComponentData movementData) =>
+            ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in DirectionData movementData) =>
             {
                 int2 i2Direction = movementData.directionLook;
                 float fMinLength = translation.Value.x;

@@ -21,7 +21,7 @@ public class DropSystem : JobComponentSystem
     {
         JobHandle jobHandle = Entities
             .WithAll<TC_PickHoldAction>()
-            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_HoldComponentData canPick, in MovementComponentData movementData) =>
+            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_HoldComponentData canPick, in DirectionData movementData) =>
             {
                 
             }).Schedule(inputDeps);

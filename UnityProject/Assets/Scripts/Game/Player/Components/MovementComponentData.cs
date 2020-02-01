@@ -1,9 +1,12 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-[GenerateAuthoringComponent]
+public struct DirectionData : IComponentData
+{
+    public int2 directionLook;
+}
+
 public struct MovementComponentData : IComponentData
 {
     public float speed;
-    public int2 directionLook;
 }
