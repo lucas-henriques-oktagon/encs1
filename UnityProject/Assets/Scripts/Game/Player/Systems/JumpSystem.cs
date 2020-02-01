@@ -8,6 +8,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Physics;
 
+[AlwaysSynchronizeSystem]
 public class JumpSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
