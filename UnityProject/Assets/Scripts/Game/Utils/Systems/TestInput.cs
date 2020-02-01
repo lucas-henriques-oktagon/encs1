@@ -15,7 +15,7 @@ public class TestInput : ComponentSystem
             {
                 if (dale)
                 {
-                    EntityManager.AddComponent<TC_PickAction>(entity);
+                    EntityManager.AddComponent<TC_PickHoldAction>(entity);
                 }
             });
     }

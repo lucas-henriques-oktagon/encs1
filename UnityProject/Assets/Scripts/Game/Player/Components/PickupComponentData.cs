@@ -9,9 +9,12 @@ public struct C_CanPick : IComponentData
 }
 public struct TC_Pickable : IComponentData {}
 
-public struct TC_PickAction : IComponentData {}
+public struct TC_PickHoldAction : IComponentData {}
 
-public struct TC_InHold : IComponentData {}
+public struct C_InHold : IComponentData
+{
+    public Entity Owner;
+}
 
 // This will hold the picked Entity
 public struct C_HoldComponentData : IComponentData

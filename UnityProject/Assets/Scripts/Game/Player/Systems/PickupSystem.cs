@@ -27,7 +27,7 @@ public class PickupSystem : JobComponentSystem
         
         
         JobHandle handle = Entities.
-            WithAll<TC_PickAction>().
+            WithAll<TC_PickHoldAction>().
             ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in MovementComponentData movementData) =>
             {
                 int2 i2Direction = movementData.directionLook;
@@ -59,9 +59,13 @@ public class PickupSystem : JobComponentSystem
                     });
 
                     commandBuffer.RemoveComponent<TC_Pickable>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
-                    commandBuffer.AddComponent<TC_InHold>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
+                    commandBuffer.AddComponent<C_InHold>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
+                    commandBuffer.SetComponent(entityInQueryIndex, entity, new C_InHold
+                    {
+                        Owner = entity,
+                    });
                 }
-                commandBuffer.RemoveComponent<TC_PickAction>(entityInQueryIndex, entity);
+                commandBuffer.RemoveComponent<TC_PickHoldAction>(entityInQueryIndex, entity);
                 
         }).WithoutBurst().Schedule(inputDeps);
 
