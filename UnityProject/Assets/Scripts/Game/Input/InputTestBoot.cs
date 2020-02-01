@@ -13,11 +13,9 @@ public class InputTestBoot : MonoBehaviour
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         var player = entityManager.CreateEntity();
-        entityManager.AddComponentData(player, new C_PlayerInput
+        entityManager.AddComponentData(player, new PlayerInput_C
         { 
-            horizontal = 0,
-            action = 0,
-            jump = 0,
+            inputId = 0
         });
         entityManager.AddComponent<Translation>(player);
         entityManager.AddComponent<MovementComponentData>(player);

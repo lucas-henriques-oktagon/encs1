@@ -4,9 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [Serializable]
-public struct C_PlayerInput : IComponentData
+public struct PlayerInput_C : IComponentData
 {
-    public int horizontal;
-    public int action;
-    public int jump;
+    public int inputId;
 }

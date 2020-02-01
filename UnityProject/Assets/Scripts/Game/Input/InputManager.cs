@@ -16,20 +16,20 @@ public class S_MovementInput : ComponentSystem
     {
         m_EntityQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { ComponentType.ReadOnly<C_PlayerInput>(), typeof(MovementComponentData) },
+            All = new ComponentType[] { ComponentType.ReadOnly<PlayerInput_C>(), typeof(MovementComponentData) },
         });
     }
        
     protected override void OnUpdate()
     {
         var entities = m_EntityQuery.ToEntityArray(Allocator.TempJob);
-        var playerInput = m_EntityQuery.ToComponentDataArray<C_PlayerInput>(Allocator.TempJob);
+        var playerInput = m_EntityQuery.ToComponentDataArray<PlayerInput_C>(Allocator.TempJob);
         var movement = m_EntityQuery.ToComponentDataArray<MovementComponentData>(Allocator.TempJob);
 
         for (int i = 0; i < playerInput.Length; i++)
         {
-            float horizontal = Input.GetAxis($"Horizontal_{playerInput[i].horizontal}");
-            EntityManager.SetComponentData(entities[i], new MovementComponentData { speed = horizontal });
+            float horizontal = Input.GetAxis($"Horizontal_{playerInput[i].inputId}");
+            EntityManager.SetComponentData(entities[i], new MovementComponentData { speed = horizontal * 8 });
         }
 
         entities.Dispose();
@@ -46,20 +46,21 @@ public class S_PickupInput : ComponentSystem
     {
         m_EntityQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { ComponentType.ReadOnly<C_PlayerInput>(), ComponentType.ReadOnly<C_CanPick>() },
+            All = new ComponentType[] { ComponentType.ReadOnly<PlayerInput_C>(), ComponentType.ReadOnly<C_CanPick>() },
         });
     }
 
     protected override void OnUpdate()
     {
         var entities = m_EntityQuery.ToEntityArray(Allocator.TempJob);
-        var playerInput = m_EntityQuery.ToComponentDataArray<C_PlayerInput>(Allocator.TempJob);
+        var playerInput = m_EntityQuery.ToComponentDataArray<PlayerInput_C>(Allocator.TempJob);
 
         for (int i = 0; i < playerInput.Length; i++)
         {
-            if(Input.GetButton($"Action_{playerInput[i].action}"))
+            if(Input.GetButton($"Action_{playerInput[i].inputId}"))
             {
                 EntityManager.AddComponent<TC_PickHoldAction>(entities[i]);
+                EntityManager.AddComponentData(entities[i], new PlayMonoAnimation_C { animation = Animator.StringToHash("shipBlue@Spin") });
             }
         }
 
