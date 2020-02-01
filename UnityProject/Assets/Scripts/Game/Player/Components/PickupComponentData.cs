@@ -1,18 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 
-public class PickupComponentData : MonoBehaviour
+public struct C_CanPick : IComponentData
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int PickupDistance;
+}
+public struct TC_Pickable : IComponentData {}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+public struct TC_PickAction : IComponentData {}
+
+public struct TC_InHold : IComponentData {}
+
+// This will hold the picked Entity
+public struct C_HoldComponentData : IComponentData
+{
+    public Entity Item;
 }
