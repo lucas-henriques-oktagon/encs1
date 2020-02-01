@@ -27,12 +27,13 @@ public class PickupSystem : JobComponentSystem
         
         
         JobHandle handle = Entities.
-            WithAll<TC_PickHoldAction>().
-            ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in DirectionData movementData) =>
+            WithAll<TC_PickHoldAction>()
+            .WithNone<C_HoldComponentData>()
+            .ForEach((Entity entity, int entityInQueryIndex, in Translation translation, in C_CanPick canPick, in DirectionData directionData) =>
             {
-                int2 i2Direction = movementData.directionLook;
+                int2 i2Direction = directionData.directionLook;
                 float fMinLength = translation.Value.x;
-                float fMaxLength = translation.Value.x + i2Direction.x;
+                float fMaxLength = translation.Value.x + i2Direction.x * canPick.PickupDistance;
             
                 Debug.Log(fMinLength + " - " + fMaxLength);
             
@@ -59,11 +60,7 @@ public class PickupSystem : JobComponentSystem
                     });
 
                     commandBuffer.RemoveComponent<TC_Pickable>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
-                    commandBuffer.AddComponent<C_InHold>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
-                    commandBuffer.SetComponent(entityInQueryIndex, entity, new C_InHold
-                    {
-                        Owner = entity,
-                    });
+                    commandBuffer.AddComponent<TC_InHold>(entityInQueryIndex, lEntitiesToPickup[iClosestEntity]);
                 }
                 commandBuffer.RemoveComponent<TC_PickHoldAction>(entityInQueryIndex, entity);
                 
